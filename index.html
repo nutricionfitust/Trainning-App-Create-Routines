@@ -19,7 +19,6 @@
   .mono{font-family:'DM Mono',monospace}
   a{color:var(--blue-2)}
 
-  /* layout */
   .topbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:14px;padding:12px 20px;background:rgba(13,17,24,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
   .brand{font-weight:800;letter-spacing:.3px}
   .brand span{color:var(--blue)}
@@ -31,38 +30,41 @@
   @media(max-width:900px){.grid{grid-template-columns:1fr}}
 
   .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
-  .card h2{margin:0 0 12px;font-size:14px;font-weight:700;letter-spacing:.2px}
+  .card h2{margin:0 0 12px;font-size:14px;font-weight:700;letter-spacing:.2px;display:flex;align-items:center;gap:8px}
   .card h2 small{font-weight:500;color:var(--muted)}
 
   label{display:block;font-size:12px;color:var(--muted);margin:10px 0 5px}
   .field{width:100%;background:var(--surface-2);border:1px solid var(--line);color:var(--txt);padding:10px 11px;border-radius:10px;font-size:14px}
   .field:focus{outline:none;border-color:var(--blue)}
+  textarea.field{resize:vertical;min-height:60px}
   .btn{background:var(--blue);color:#fff;border:none;padding:10px 15px;border-radius:10px;font-weight:700;font-size:14px}
   .btn:hover{filter:brightness(1.08)}
   .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--txt);font-weight:600}
   .btn.ghost:hover{border-color:var(--blue-2)}
   .btn.sm{padding:6px 10px;font-size:12px;border-radius:8px}
   .btn.danger{background:transparent;border:1px solid var(--line);color:var(--danger)}
+  .btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
   .row{display:flex;gap:8px;align-items:center}
   .muted{color:var(--muted)}
+  .hint{font-size:12px;color:var(--muted)}
 
-  /* catalogo */
   .filters{display:flex;gap:8px;margin-bottom:10px}
   .filters .field{flex:1}
-  .cat-list{max-height:62vh;overflow:auto;padding-right:4px}
+  .cat-list{max-height:54vh;overflow:auto;padding-right:4px}
   .cat-group{margin-bottom:6px}
   .cat-group-h{position:sticky;top:0;background:var(--surface);font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--blue-3);padding:6px 2px}
   .ex{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:9px;border:1px solid transparent}
   .ex:hover{background:var(--surface-2);border-color:var(--line)}
   .ex .nm{flex:1;font-size:13px}
   .ex .vid{font-size:10px}
-  .ex .vid.no{color:var(--danger)}
-  .ex .vid.yes{color:var(--ok)}
+  .ex .vid.no{color:var(--danger)} .ex .vid.yes{color:var(--ok)}
+  .ex .edit{background:transparent;border:none;color:var(--muted);font-size:13px}
+  .ex .edit:hover{color:var(--blue-2)}
   .add{background:var(--blue);color:#fff;border:none;width:26px;height:26px;border-radius:8px;font-size:16px;line-height:1;flex:none}
 
-  /* dias / secciones */
   .dia{border:1px solid var(--line);border-radius:12px;margin-bottom:14px;overflow:hidden}
   .dia-h{display:flex;gap:8px;align-items:center;padding:10px 12px;background:var(--surface-2)}
+  .dia-prefix{font-weight:700;color:var(--blue-3);white-space:nowrap}
   .dia-h .field{flex:1;font-weight:700}
   .sec{padding:10px 12px;border-top:1px solid var(--line)}
   .sec-h{display:flex;gap:8px;align-items:center;margin-bottom:8px}
@@ -78,21 +80,21 @@
   .item-foot{display:flex;gap:8px;align-items:center;margin-top:4px}
   .item-foot .rest{width:120px}
   .empty{color:var(--muted);font-size:13px;padding:8px;text-align:center;border:1px dashed var(--line);border-radius:9px}
-
-  /* picker target highlight */
   .sec.active{box-shadow:inset 0 0 0 2px var(--blue)}
+  .hiit-info{margin-top:8px}
 
-  /* toast */
-  #toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--surface-2);border:1px solid var(--line);padding:12px 18px;border-radius:12px;opacity:0;transition:.25s;pointer-events:none;z-index:50}
+  #toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--surface-2);border:1px solid var(--line);padding:12px 18px;border-radius:12px;opacity:0;transition:.25s;pointer-events:none;z-index:60}
   #toast.show{opacity:1}
   #toast.ok{border-color:var(--ok)} #toast.err{border-color:var(--danger)}
 
-  /* gate */
   .gate{max-width:420px;margin:8vh auto;}
   .hidden{display:none!important}
   .saved-list .it{display:flex;gap:8px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:9px;margin-bottom:6px}
   .saved-list .it .nm{flex:1;font-size:13px}
-  .saved-list .it .who{font-size:11px;color:var(--muted)}
+
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:50}
+  .modal{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;width:min(520px,92vw);max-height:90vh;overflow:auto}
+  .name-preview{font-size:13px;color:var(--ok);margin-top:6px}
 </style>
 </head>
 <body>
@@ -100,15 +102,16 @@
 <div class="topbar">
   <div class="brand">Nutrición<span>Fit</span> · Armador de Rutinas</div>
   <div class="sp"></div>
+  <button class="btn ghost sm hidden" id="manageExBtn">Gestionar ejercicios</button>
   <span class="pill" id="userPill"></span>
   <button class="btn ghost sm hidden" id="logoutBtn">Salir</button>
 </div>
 
-<!-- ========== PANTALLA DE CONEXIÓN / LOGIN ========== -->
+<!-- LOGIN -->
 <div class="wrap" id="gateWrap">
   <div class="gate card">
     <h2>Conectar con Supabase</h2>
-    <p class="muted" style="margin-top:0;font-size:13px">Pegá la URL y la <b>anon key</b> de tu proyecto (Supabase → Project Settings → API). Se guardan en este navegador, no las vuelves a escribir.</p>
+    <p class="muted" style="margin-top:0;font-size:13px">Pegá la URL y la <b>anon key</b> de tu proyecto (Supabase → Project Settings → API). Se guardan en este navegador.</p>
     <label>Project URL</label>
     <input class="field mono" id="supaUrl" placeholder="https://xxxxx.supabase.co">
     <label>anon public key</label>
@@ -125,7 +128,7 @@
   </div>
 </div>
 
-<!-- ========== APP ========== -->
+<!-- APP -->
 <div class="wrap hidden" id="app">
   <div class="grid">
 
@@ -136,7 +139,7 @@
         <input class="field" id="search" placeholder="Buscar ejercicio…">
         <select class="field" id="groupFilter" style="max-width:130px"></select>
       </div>
-      <p class="muted" style="font-size:12px;margin:0 0 8px">Clic en <b>＋</b> para agregar a la sección activa (la que tiene borde azul).</p>
+      <p class="hint" style="margin:0 0 8px">Clic en <b>＋</b> para agregar a la sección activa (borde azul). El lápiz edita el ejercicio/video.</p>
       <div class="cat-list" id="catList"></div>
     </div>
 
@@ -150,15 +153,16 @@
             <select class="field" id="alumnoSel"></select>
           </div>
           <div>
-            <label>Nombre de la rutina (lo ve el alumno)</label>
-            <input class="field" id="rutinaNombre" placeholder="👉🏻 esta es tu rutina de PIERNAS 💪🏻🔥">
+            <label>Nombre o apodo para el plan (opcional)</label>
+            <input class="field" id="apodo" placeholder="si lo dejás vacío usa el nombre del alumno">
           </div>
         </div>
+        <div class="name-preview" id="namePreview"></div>
         <div id="nuevoAlumnoBox" class="hidden" style="margin-top:10px;padding:12px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px">
           <div class="grid" style="grid-template-columns:1fr 1fr 1fr;gap:10px">
-            <div><label>Nombre del alumno</label><input class="field" id="naNombre" placeholder="Juan Pérez"></div>
+            <div><label>Nombre y apellido del alumno</label><input class="field" id="naNombre" placeholder="Juan Pérez"></div>
             <div><label>Contraseña de acceso (única)</label><input class="field mono" id="naPass" placeholder="clave-unica-123"></div>
-            <div><label>Carpeta / plan</label><input class="field" id="naCarpeta" placeholder="5 MUSCULACIÓN + 2 HIIT"></div>
+            <div><label>Carpeta / plan</label><select class="field" id="naCarpeta"></select></div>
           </div>
         </div>
       </div>
@@ -185,22 +189,18 @@
 </div>
 
 <div id="toast"></div>
+<div id="modalHost"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-/* ---------- almacenamiento seguro (no rompe si está en sandbox) ---------- */
-const store = {
-  get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
-  set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} },
-  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
-};
-
-let sb = null;            // cliente supabase
-let EJERCICIOS = [];      // catálogo
-let ALUMNOS = [];
-let activeSec = null;     // {diaIdx, secIdx} sección activa para el picker
-let editId = null;        // id de rutina en edición (null = nueva)
-
+/* ---------- constantes ---------- */
+const CARPETAS = ["1 MUSCULACIÓN","2 MUSCULACIÓN + (2 LISS)","2 MUSCULACIÓN + 2 HIIT",
+  "3 MUSCULACIÓN + 1 HIIT + (1 LISS)","3 MUSCULACIÓN + 2 HIIT","3 MUSCULACIÓN + 2 HIIT + (1 LISS)",
+  "4 MUSCULACIÓN (1 FB HIIT) + (1 LISS)","4 MUSCULACIÓN + 1 HIIT + (1 LISS)","4 MUSCULACIÓN + 2 HIIT",
+  "5 MUSCULACIÓN + (1 LISS)","5 MUSCULACIÓN + 1 HIIT + (1 LISS)","5 MUSCULACIÓN + 2 HIIT","5 MUSCULACIÓN + 3 HIIT",
+  "6 MUSCULACIÓN + 2 HIIT","6 MUSCULACIÓN + 2 HIIT + (1 LISS)","7 MUSCULACIÓN + 2 HIIT"];
+const SECCIONES = ["Acondicionamiento & Calentamiento","Entrenamiento de Fuerza","Entrenamiento HIIT"];
+const SEC_ORDER = {"Acondicionamiento & Calentamiento":0,"Entrenamiento de Fuerza":1,"Entrenamiento HIIT":2};
 const GRUPOS_LABEL = {
   piernas_general:'Piernas (general)', cuadriceps:'Cuádriceps', gluteos:'Glúteos',
   isquiotibiales:'Isquiotibiales', pantorrillas:'Pantorrillas', pectorales:'Pectorales',
@@ -209,87 +209,74 @@ const GRUPOS_LABEL = {
   pliometria:'Pliometría', weight_lifting:'Weight lifting', acondicionamiento:'Acondicionamiento'
 };
 
-/* modelo del plan en memoria */
+/* ---------- estado ---------- */
+const store = {
+  get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+};
+let sb=null, EJERCICIOS=[], ALUMNOS=[], activeSec=null, combineTarget=null, editId=null;
+
+/* plan: { dias: [ { musculo, secciones: [ { nombre, infoHIIT, items:[ {tipo,ejercicios:[{nombre,series,reps}],descanso} ] } ] } ] } */
 let plan = { dias: [] };
 
 /* ---------- toast ---------- */
-function toast(msg, type){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.className='show '+(type||'');
-  setTimeout(()=>t.className='',2600);
-}
+function toast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='show '+(type||'');setTimeout(()=>t.className='',2600);}
 
 /* ---------- login ---------- */
-document.getElementById('supaUrl').value = store.get('nfu_url')||'';
-document.getElementById('supaKey').value = store.get('nfu_key')||'';
-document.getElementById('email').value = store.get('nfu_email')||'';
-
-document.getElementById('loginBtn').onclick = async ()=>{
-  const url=document.getElementById('supaUrl').value.trim();
-  const key=document.getElementById('supaKey').value.trim();
-  const email=document.getElementById('email').value.trim();
-  const pass=document.getElementById('pass').value;
+document.getElementById('supaUrl').value=store.get('nfu_url')||'';
+document.getElementById('supaKey').value=store.get('nfu_key')||'';
+document.getElementById('email').value=store.get('nfu_email')||'';
+document.getElementById('loginBtn').onclick=async()=>{
+  const url=val('supaUrl'),key=val('supaKey'),email=val('email'),pass=document.getElementById('pass').value;
   const msg=document.getElementById('gateMsg');
-  if(!url||!key){ msg.textContent='Falta URL o key.'; return; }
+  if(!url||!key){msg.textContent='Falta URL o key.';return;}
   try{
-    sb = supabase.createClient(url,key);
-    msg.textContent='Conectando…';
-    const {error} = await sb.auth.signInWithPassword({email,password:pass});
-    if(error){ msg.textContent='No se pudo entrar: '+error.message; return; }
-    store.set('nfu_url',url); store.set('nfu_key',key); store.set('nfu_email',email);
+    sb=supabase.createClient(url,key); msg.textContent='Conectando…';
+    const {error}=await sb.auth.signInWithPassword({email,password:pass});
+    if(error){msg.textContent='No se pudo entrar: '+error.message;return;}
+    store.set('nfu_url',url);store.set('nfu_key',key);store.set('nfu_email',email);
     await startApp(email);
-  }catch(e){ msg.textContent='Error: '+e.message; }
+  }catch(e){msg.textContent='Error: '+e.message;}
 };
-
-document.getElementById('logoutBtn').onclick = async ()=>{
-  if(sb) await sb.auth.signOut();
-  location.reload();
-};
-
-/* reconexión automática si ya había sesión */
-(async ()=>{
-  const url=store.get('nfu_url'), key=store.get('nfu_key');
-  if(url&&key){
-    sb = supabase.createClient(url,key);
-    const {data}=await sb.auth.getSession();
-    if(data && data.session){ await startApp(data.session.user.email); }
-  }
-})();
+document.getElementById('logoutBtn').onclick=async()=>{if(sb)await sb.auth.signOut();location.reload();};
+(async()=>{const url=store.get('nfu_url'),key=store.get('nfu_key');if(url&&key){sb=supabase.createClient(url,key);const{data}=await sb.auth.getSession();if(data&&data.session)await startApp(data.session.user.email);}})();
 
 async function startApp(email){
   document.getElementById('gateWrap').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   document.getElementById('logoutBtn').classList.remove('hidden');
-  document.getElementById('userPill').textContent = email||'conectado';
+  document.getElementById('manageExBtn').classList.remove('hidden');
+  document.getElementById('userPill').textContent=email||'conectado';
+  fillCarpetas();
   await loadEjercicios();
   await loadAlumnos();
   if(plan.dias.length===0) addDia();
+  updateNamePreview();
 }
 
-/* ---------- cargar catálogo ---------- */
+function fillCarpetas(){
+  document.getElementById('naCarpeta').innerHTML='<option value="">— Elegí carpeta —</option>'+
+    CARPETAS.map(c=>`<option value="${escapeAttr(c)}">${escapeHtml(c)}</option>`).join('');
+}
+
+/* ---------- catálogo ---------- */
 async function loadEjercicios(){
   const {data,error}=await sb.from('ejercicios').select('*').order('grupo').order('nombre');
-  if(error){ toast('Error cargando ejercicios: '+error.message,'err'); return; }
+  if(error){toast('Error cargando ejercicios: '+error.message,'err');return;}
   EJERCICIOS=data||[];
   document.getElementById('catCount').textContent='('+EJERCICIOS.length+')';
-  // filtro de grupos
   const groups=[...new Set(EJERCICIOS.map(e=>e.grupo))];
-  const sel=document.getElementById('groupFilter');
-  sel.innerHTML='<option value="">Todos los grupos</option>'+
+  document.getElementById('groupFilter').innerHTML='<option value="">Todos los grupos</option>'+
     groups.map(g=>`<option value="${g}">${GRUPOS_LABEL[g]||g}</option>`).join('');
   renderCatalog();
 }
 document.getElementById('search').oninput=renderCatalog;
 document.getElementById('groupFilter').onchange=renderCatalog;
-
 function renderCatalog(){
-  const q=document.getElementById('search').value.toLowerCase().trim();
-  const gf=document.getElementById('groupFilter').value;
+  const q=val('search').toLowerCase(), gf=val('groupFilter');
   const list=document.getElementById('catList');
-  const filtered=EJERCICIOS.filter(e=>
-    (!gf||e.grupo===gf) && (!q||e.nombre.toLowerCase().includes(q)));
-  const byGroup={};
-  filtered.forEach(e=>{(byGroup[e.grupo]=byGroup[e.grupo]||[]).push(e);});
+  const filtered=EJERCICIOS.filter(e=>(!gf||e.grupo===gf)&&(!q||e.nombre.toLowerCase().includes(q)));
+  const byGroup={}; filtered.forEach(e=>{(byGroup[e.grupo]=byGroup[e.grupo]||[]).push(e);});
   let html='';
   for(const g of Object.keys(byGroup)){
     html+=`<div class="cat-group"><div class="cat-group-h">${GRUPOS_LABEL[g]||g}</div>`;
@@ -297,6 +284,7 @@ function renderCatalog(){
       html+=`<div class="ex">
         <span class="vid ${e.video_url?'yes':'no'}" title="${e.video_url?'Con video':'Sin video'}">●</span>
         <span class="nm">${escapeHtml(e.nombre)}</span>
+        <button class="edit" data-edit="${escapeAttr(e.nombre)}" title="Editar / video">✎</button>
         <button class="add" data-nombre="${escapeAttr(e.nombre)}">＋</button>
       </div>`;
     }
@@ -304,96 +292,175 @@ function renderCatalog(){
   }
   list.innerHTML=html||'<p class="empty">Sin resultados.</p>';
   list.querySelectorAll('.add').forEach(b=>b.onclick=()=>addExerciseToActive(b.dataset.nombre));
+  list.querySelectorAll('.edit').forEach(b=>b.onclick=()=>openExModal(EJERCICIOS.find(x=>x.nombre===b.dataset.edit)));
+}
+
+/* ---------- gestión de ejercicios / videos de Drive (cambio 11) ---------- */
+document.getElementById('manageExBtn').onclick=()=>openExModal(null);
+function openExModal(ex){
+  const isEdit=!!ex;
+  const groupsOpts=Object.keys(GRUPOS_LABEL).map(g=>`<option value="${g}" ${ex&&ex.grupo===g?'selected':''}>${GRUPOS_LABEL[g]}</option>`).join('');
+  const host=document.getElementById('modalHost');
+  host.innerHTML=`<div class="modal-bg"><div class="modal">
+    <h2 style="margin-top:0">${isEdit?'Editar ejercicio':'Nuevo ejercicio / video'}</h2>
+    <label>Grupo muscular</label><select class="field" id="exGrupo">${groupsOpts}</select>
+    <label>Nombre del ejercicio</label>
+    <input class="field" id="exNombre" value="${ex?escapeAttr(ex.nombre):''}" ${isEdit?'':''}>
+    <label>Link del video (Google Drive)</label>
+    <input class="field mono" id="exVideo" value="${ex?escapeAttr(ex.video_url||''):''}" placeholder="https://drive.google.com/file/d/.../view">
+    <label>Descripción (la que ve el alumno)</label>
+    <textarea class="field" id="exDesc" rows="4">${ex?escapeHtml(ex.descripcion||''):''}</textarea>
+    <div class="row" style="margin-top:14px">
+      <button class="btn" id="exSave">${isEdit?'Guardar cambios':'Crear ejercicio'}</button>
+      <button class="btn ghost" id="exCancel">Cancelar</button>
+      <span class="sp" style="flex:1"></span>
+      ${isEdit?'<button class="btn danger sm" id="exDel">Borrar</button>':''}
+    </div>
+    <p class="hint" style="margin-bottom:0">Si actualizás un video en Drive y el link no cambia, no hace falta tocar nada. Si cambia el link, lo pegás acá.</p>
+  </div></div>`;
+  const close=()=>host.innerHTML='';
+  document.getElementById('exCancel').onclick=close;
+  host.querySelector('.modal-bg').onclick=e=>{if(e.target.classList.contains('modal-bg'))close();};
+  document.getElementById('exSave').onclick=async()=>{
+    const rec={grupo:val('exGrupo'),nombre:val('exNombre').trim(),
+      video_url:val('exVideo').trim()||null, descripcion:val('exDesc').trim()||null};
+    if(!rec.nombre){toast('Falta el nombre.','err');return;}
+    const {error}=await sb.from('ejercicios').upsert(rec,{onConflict:'nombre'});
+    if(error){toast('Error: '+error.message,'err');return;}
+    toast('Ejercicio guardado ✓','ok'); close(); await loadEjercicios();
+  };
+  if(isEdit){
+    document.getElementById('exDel').onclick=async()=>{
+      if(!confirm('¿Borrar este ejercicio del catálogo?'))return;
+      const {error}=await sb.from('ejercicios').delete().eq('nombre',ex.nombre);
+      if(error){toast('Error: '+error.message,'err');return;}
+      toast('Ejercicio borrado.','ok'); close(); await loadEjercicios();
+    };
+  }
 }
 
 /* ---------- alumnos ---------- */
 async function loadAlumnos(){
   const {data,error}=await sb.from('alumnos').select('*').order('nombre');
-  if(error){ toast('Error cargando alumnos: '+error.message,'err'); return; }
+  if(error){toast('Error cargando alumnos: '+error.message,'err');return;}
   ALUMNOS=data||[];
-  const sel=document.getElementById('alumnoSel');
-  sel.innerHTML='<option value="">— Elegí un alumno —</option>'+
+  document.getElementById('alumnoSel').innerHTML='<option value="">— Elegí un alumno —</option>'+
     ALUMNOS.map(a=>`<option value="${a.id}">${escapeHtml(a.nombre)} (${escapeHtml(a.password)})</option>`).join('')+
     '<option value="__new__">➕ Crear alumno nuevo…</option>';
 }
-document.getElementById('alumnoSel').onchange=async (e)=>{
+document.getElementById('alumnoSel').onchange=async(e)=>{
   const v=e.target.value;
   document.getElementById('nuevoAlumnoBox').classList.toggle('hidden', v!=='__new__');
-  if(v && v!=='__new__'){ await loadSavedRutinas(v); }
-  else { document.getElementById('savedList').innerHTML='<p class="empty">'+(v==='__new__'?'Completá los datos del alumno nuevo abajo.':'Elegí un alumno para ver sus rutinas.')+'</p>'; }
+  updateNamePreview();
+  if(v&&v!=='__new__'){await loadSavedRutinas(v);}
+  else{document.getElementById('savedList').innerHTML='<p class="empty">'+(v==='__new__'?'Completá los datos del alumno nuevo abajo.':'Elegí un alumno para ver sus rutinas.')+'</p>';}
 };
+document.getElementById('apodo').oninput=updateNamePreview;
+document.getElementById('naNombre')&&(document.getElementById('naNombre').oninput=updateNamePreview);
+
+function currentAlumnoNombre(){
+  const v=val('alumnoSel');
+  if(v==='__new__') return val('naNombre').trim();
+  const a=ALUMNOS.find(x=>x.id==v); return a?a.nombre:'';
+}
+function buildRutinaNombre(){
+  const apodo=val('apodo').trim();
+  const base=apodo||currentAlumnoNombre()||'';
+  return 'Mi Plan de Entrenamiento - '+base;
+}
+function updateNamePreview(){
+  const p=document.getElementById('namePreview');
+  const base=val('apodo').trim()||currentAlumnoNombre();
+  p.textContent = base ? 'Nombre del plan: '+buildRutinaNombre() : 'Elegí un alumno para ver el nombre del plan.';
+}
 
 async function loadSavedRutinas(alumnoId){
   const {data,error}=await sb.from('rutinas').select('*').eq('alumno_id',alumnoId).order('creado_en',{ascending:false});
   const box=document.getElementById('savedList');
-  if(error){ box.innerHTML='<p class="empty">Error: '+error.message+'</p>'; return; }
-  if(!data||!data.length){ box.innerHTML='<p class="empty">Este alumno todavía no tiene rutinas.</p>'; return; }
-  box.innerHTML=data.map(r=>`<div class="it">
-      <span class="nm">${escapeHtml(r.nombre)}</span>
+  if(error){box.innerHTML='<p class="empty">Error: '+error.message+'</p>';return;}
+  if(!data||!data.length){box.innerHTML='<p class="empty">Este alumno todavía no tiene rutinas.</p>';return;}
+  box.innerHTML=data.map(r=>`<div class="it"><span class="nm">${escapeHtml(r.nombre)}</span>
       <button class="btn ghost sm" data-edit="${r.id}">Editar</button>
-      <button class="btn danger sm" data-del="${r.id}">Borrar</button>
-    </div>`).join('');
+      <button class="btn danger sm" data-del="${r.id}">Borrar</button></div>`).join('');
   box.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>loadRutinaForEdit(data.find(r=>r.id==b.dataset.edit)));
   box.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>delRutina(b.dataset.del,alumnoId));
 }
-
 function loadRutinaForEdit(r){
   editId=r.id;
-  document.getElementById('rutinaNombre').value=r.nombre||'';
-  plan = (r.plan && r.plan.dias) ? r.plan : {dias:[]};
+  // reconstruir apodo desde el nombre guardado
+  const pre='Mi Plan de Entrenamiento - ';
+  const base=(r.nombre||'').startsWith(pre)?r.nombre.slice(pre.length):'';
+  document.getElementById('apodo').value=(base===currentAlumnoNombre())?'':base;
+  plan=(r.plan&&r.plan.dias)?normalizePlan(r.plan):{dias:[]};
   if(plan.dias.length===0) plan.dias.push(blankDia());
-  renderDias();
-  toast('Rutina cargada para editar.','ok');
-  window.scrollTo({top:0,behavior:'smooth'});
+  renderDias(); updateNamePreview();
+  toast('Rutina cargada para editar.','ok'); window.scrollTo({top:0,behavior:'smooth'});
 }
-
+function normalizePlan(p){
+  // asegurar que cada día tenga "musculo" derivado de nombre "Día N - X"
+  (p.dias||[]).forEach(d=>{
+    if(d.musculo===undefined){
+      const m=(d.nombre||'').match(/^Día\s*\d+\s*-\s*(.*)$/i);
+      d.musculo=m?m[1]:(d.nombre||'');
+    }
+    (d.secciones||[]).forEach(s=>{ if(!s.items)s.items=[]; });
+  });
+  return p;
+}
 async function delRutina(id,alumnoId){
-  if(!confirm('¿Borrar esta rutina? No se puede deshacer.')) return;
+  if(!confirm('¿Borrar esta rutina?'))return;
   const {error}=await sb.from('rutinas').delete().eq('id',id);
-  if(error){ toast('Error: '+error.message,'err'); return; }
-  toast('Rutina borrada.','ok');
-  if(editId==id){ newRutina(); }
-  loadSavedRutinas(alumnoId);
+  if(error){toast('Error: '+error.message,'err');return;}
+  toast('Rutina borrada.','ok'); if(editId==id)newRutina(); loadSavedRutinas(alumnoId);
 }
 
 /* ---------- editor de plan ---------- */
-function blankDia(){ return {nombre:'', secciones:[blankSec()]}; }
-function blankSec(){ return {nombre:'Entrenamiento de Fuerza', items:[]}; }
-
+function blankDia(){return {musculo:'', secciones:[blankSec('Entrenamiento de Fuerza')]};}
+function blankSec(nombre){return {nombre:nombre||SECCIONES[1], infoHIIT:'', items:[]};}
 document.getElementById('addDia').onclick=()=>addDia();
-function addDia(){ plan.dias.push(blankDia()); renderDias(); }
+function addDia(){plan.dias.push(blankDia());renderDias();}
+
+function sortSecciones(dia){ dia.secciones.sort((a,b)=>(SEC_ORDER[a.nombre]??9)-(SEC_ORDER[b.nombre]??9)); }
 
 function renderDias(){
   const wrap=document.getElementById('dias');
-  if(!plan.dias.length){ wrap.innerHTML='<p class="empty">Agregá tu primer día.</p>'; return; }
+  if(!plan.dias.length){wrap.innerHTML='<p class="empty">Agregá tu primer día.</p>';return;}
   wrap.innerHTML='';
   plan.dias.forEach((dia,di)=>{
-    const d=document.createElement('div'); d.className='dia';
+    sortSecciones(dia);
+    const d=document.createElement('div');d.className='dia';
     d.innerHTML=`<div class="dia-h">
-      <input class="field" placeholder="Nombre del día (ej: Día 1 - Piernas)" value="${escapeAttr(dia.nombre)}">
+      <span class="dia-prefix">Día ${di+1} -</span>
+      <input class="field" placeholder="Piernas / Superior / Pecho + Tríceps…" value="${escapeAttr(dia.musculo||'')}">
       <button class="btn ghost sm" data-addsec>+ Sección</button>
       <button class="x" data-deldia title="Borrar día">🗑</button>
     </div>`;
-    d.querySelector('.dia-h .field').oninput=e=>dia.nombre=e.target.value;
-    d.querySelector('[data-addsec]').onclick=()=>{dia.secciones.push(blankSec());renderDias();};
-    d.querySelector('[data-deldia]').onclick=()=>{if(confirm('¿Borrar el día completo?')){plan.dias.splice(di,1);if(activeSec&&activeSec.di===di)activeSec=null;renderDias();}};
+    d.querySelector('.dia-h .field').oninput=e=>dia.musculo=e.target.value;
+    d.querySelector('[data-addsec]').onclick=()=>{
+      const usados=dia.secciones.map(s=>s.nombre);
+      const libre=SECCIONES.find(s=>!usados.includes(s))||SECCIONES[1];
+      dia.secciones.push(blankSec(libre));renderDias();
+    };
+    d.querySelector('[data-deldia]').onclick=()=>{if(confirm('¿Borrar el día completo?')){plan.dias.splice(di,1);activeSec=null;combineTarget=null;renderDias();}};
 
     dia.secciones.forEach((sec,si)=>{
-      const s=document.createElement('div'); s.className='sec';
-      if(activeSec&&activeSec.di===di&&activeSec.si===si) s.classList.add('active');
+      const isActive=activeSec&&activeSec.di===di&&activeSec.si===si;
+      const s=document.createElement('div');s.className='sec'+(isActive?' active':'');
+      const opts=SECCIONES.map(n=>`<option value="${escapeAttr(n)}" ${sec.nombre===n?'selected':''}>${escapeHtml(n)}</option>`).join('');
       s.innerHTML=`<div class="sec-h">
-        <input class="field" placeholder="Nombre de la sección (ej: Acondicionamiento)" value="${escapeAttr(sec.nombre)}">
-        <button class="btn ${(activeSec&&activeSec.di===di&&activeSec.si===si)?'':'ghost'} sm" data-pick>${(activeSec&&activeSec.di===di&&activeSec.si===si)?'● Activa':'Elegir aquí'}</button>
+        <select class="field" data-secname>${opts}</select>
+        <button class="btn ${isActive?'active':'ghost'} sm" data-pick>${isActive?'● Activa':'Elegir aquí'}</button>
         <button class="x" data-delsec title="Borrar sección">🗑</button>
       </div>`;
-      s.querySelector('.sec-h .field').oninput=e=>sec.nombre=e.target.value;
-      s.querySelector('[data-pick]').onclick=()=>{activeSec={di,si};renderDias();};
-      s.querySelector('[data-delsec]').onclick=()=>{if(confirm('¿Borrar la sección?')){dia.secciones.splice(si,1);activeSec=null;renderDias();}};
+      s.querySelector('[data-secname]').onchange=e=>{sec.nombre=e.target.value;renderDias();};
+      s.querySelector('[data-pick]').onclick=()=>{activeSec={di,si};combineTarget=null;renderDias();};
+      s.querySelector('[data-delsec]').onclick=()=>{if(confirm('¿Borrar la sección?')){dia.secciones.splice(si,1);activeSec=null;combineTarget=null;renderDias();}};
 
       const itemsBox=document.createElement('div');
-      if(!sec.items.length){ itemsBox.innerHTML='<p class="empty">Marcá esta sección como activa y agregá ejercicios desde el catálogo →</p>'; }
+      if(!sec.items.length){itemsBox.innerHTML='<p class="empty">Marcá esta sección como activa y agregá ejercicios desde el catálogo →</p>';}
       sec.items.forEach((item,ii)=>{
-        const it=document.createElement('div'); it.className='item'+(item.tipo==='superset'?' superset':'');
+        const it=document.createElement('div');it.className='item'+(item.tipo==='superset'?' superset':'');
+        const combining=combineTarget&&combineTarget.di===di&&combineTarget.si===si&&combineTarget.ii===ii;
         let exHtml='';
         item.ejercicios.forEach((ex,xi)=>{
           exHtml+=`<div class="exrow">
@@ -403,18 +470,15 @@ function renderDias(){
             <button class="x" data-rmex="${xi}" title="Quitar">✕</button>
           </div>`;
         });
-        it.innerHTML=`<div class="item-tag">${item.tipo==='superset'?'🔗 Superserie':'Ejercicio'}
-            <button class="btn ghost sm" data-combine>+ combinar (superset)</button></div>
+        const tag=item.tipo==='superset'?'🔗 Superset ('+item.ejercicios.length+' ejercicios)':'Ejercicio';
+        it.innerHTML=`<div class="item-tag">${tag}
+            <button class="btn ${combining?'active':'ghost'} sm" data-combine>${combining?'● combinando…':'+ combinar (superset)'}</button></div>
           ${exHtml}
-          <div class="item-foot">
-            <span class="muted" style="font-size:12px">Descanso:</span>
+          <div class="item-foot"><span class="muted" style="font-size:12px">Descanso:</span>
             <input class="field rest" placeholder="1-2min" value="${escapeAttr(item.descanso||'')}" data-rest>
             <span class="sp" style="flex:1"></span>
-            <button class="x" data-rmitem title="Quitar bloque">🗑</button>
-          </div>`;
-        it.querySelectorAll('[data-f]').forEach(inp=>inp.oninput=e=>{
-          item.ejercicios[+inp.dataset.xi][inp.dataset.f]=e.target.value;
-        });
+            <button class="x" data-rmitem title="Quitar bloque">🗑</button></div>`;
+        it.querySelectorAll('[data-f]').forEach(inp=>inp.oninput=e=>{item.ejercicios[+inp.dataset.xi][inp.dataset.f]=e.target.value;});
         it.querySelectorAll('[data-rmex]').forEach(b=>b.onclick=()=>{
           item.ejercicios.splice(+b.dataset.rmex,1);
           if(item.ejercicios.length<=1)item.tipo='simple';
@@ -422,80 +486,88 @@ function renderDias(){
           renderDias();
         });
         it.querySelector('[data-rest]').oninput=e=>item.descanso=e.target.value;
-        it.querySelector('[data-combine]').onclick=()=>{activeSec={di,si};combineTarget={di,si,ii};toast('Ahora clic en un ejercicio del catálogo para combinarlo.','ok');};
-        it.querySelector('[data-rmitem]').onclick=()=>{sec.items.splice(ii,1);renderDias();};
+        it.querySelector('[data-combine]').onclick=()=>{
+          if(combining){combineTarget=null;} // segundo clic: cierra la superset
+          else{activeSec={di,si};combineTarget={di,si,ii};item.tipo='superset';}
+          renderDias();
+        };
+        it.querySelector('[data-rmitem]').onclick=()=>{
+          if(combineTarget&&combineTarget.di===di&&combineTarget.si===si&&combineTarget.ii===ii)combineTarget=null;
+          sec.items.splice(ii,1);renderDias();
+        };
         itemsBox.appendChild(it);
       });
       s.appendChild(itemsBox);
+
+      if(sec.nombre==='Entrenamiento HIIT'){
+        const info=document.createElement('div');info.className='hiit-info';
+        info.innerHTML=`<label style="margin-top:4px">Más información de HIIT (la ve el alumno)</label>
+          <textarea class="field" rows="3" placeholder="Explicá acá el HIIT de este día…">${escapeHtml(sec.infoHIIT||'')}</textarea>`;
+        info.querySelector('textarea').oninput=e=>sec.infoHIIT=e.target.value;
+        s.appendChild(info);
+      }
       d.appendChild(s);
     });
     wrap.appendChild(d);
   });
 }
 
-let combineTarget=null;
 function addExerciseToActive(nombre){
-  if(!activeSec){ toast('Primero marcá una sección como activa.','err'); return; }
-  const sec=plan.dias[activeSec.di].secciones[activeSec.si];
-  if(combineTarget && combineTarget.di===activeSec.di && combineTarget.si===activeSec.si){
+  if(combineTarget){
+    const sec=plan.dias[combineTarget.di].secciones[combineTarget.si];
     const item=sec.items[combineTarget.ii];
-    item.tipo='superset';
-    item.ejercicios.push({nombre,series:'',reps:''});
-    combineTarget=null;
-  }else{
-    sec.items.push({tipo:'simple',ejercicios:[{nombre,series:'',reps:''}],descanso:''});
+    item.tipo='superset'; item.ejercicios.push({nombre,series:'',reps:''});
+    renderDias(); return;
   }
+  if(!activeSec){toast('Primero marcá una sección como activa.','err');return;}
+  const sec=plan.dias[activeSec.di].secciones[activeSec.si];
+  sec.items.push({tipo:'simple',ejercicios:[{nombre,series:'',reps:''}],descanso:''});
   renderDias();
 }
 
 /* ---------- guardar ---------- */
 document.getElementById('saveBtn').onclick=saveRutina;
 async function saveRutina(){
-  const nombre=document.getElementById('rutinaNombre').value.trim();
-  if(!nombre){ toast('Poné un nombre a la rutina.','err'); return; }
-  let alumnoId=document.getElementById('alumnoSel').value;
-
-  // crear alumno si corresponde
+  let alumnoId=val('alumnoSel');
   if(alumnoId==='__new__'){
-    const na={
-      nombre:document.getElementById('naNombre').value.trim(),
-      password:document.getElementById('naPass').value.trim(),
-      carpeta:document.getElementById('naCarpeta').value.trim()||null
-    };
-    if(!na.nombre||!na.password){ toast('Faltan nombre y contraseña del alumno nuevo.','err'); return; }
+    const na={nombre:val('naNombre').trim(),password:val('naPass').trim(),carpeta:val('naCarpeta')||null};
+    if(!na.nombre||!na.password){toast('Faltan nombre y contraseña del alumno.','err');return;}
+    if(!na.carpeta){toast('Elegí una carpeta / plan.','err');return;}
     const {data,error}=await sb.from('alumnos').insert(na).select().single();
-    if(error){ toast('Error creando alumno: '+error.message,'err'); return; }
-    alumnoId=data.id;
-    await loadAlumnos();
+    if(error){toast('Error creando alumno: '+error.message,'err');return;}
+    alumnoId=data.id; await loadAlumnos();
     document.getElementById('alumnoSel').value=alumnoId;
     document.getElementById('nuevoAlumnoBox').classList.add('hidden');
   }
-  if(!alumnoId){ toast('Elegí o creá un alumno.','err'); return; }
+  if(!alumnoId){toast('Elegí o creá un alumno.','err');return;}
 
-  const payload={alumno_id:Number(alumnoId), nombre, plan};
-  let res;
-  if(editId){ res=await sb.from('rutinas').update(payload).eq('id',editId).select().single(); }
-  else { res=await sb.from('rutinas').insert(payload).select().single(); }
-  if(res.error){ toast('Error al guardar: '+res.error.message,'err'); return; }
-  editId=res.data.id;
-  toast('Rutina guardada ✓','ok');
-  loadSavedRutinas(alumnoId);
+  // construir nombres de día y limpiar
+  const planOut={dias:plan.dias.map((d,i)=>{
+    sortSecciones(d);
+    return {nombre:`Día ${i+1} - ${(d.musculo||'').trim()}`, musculo:(d.musculo||'').trim(),
+      secciones:d.secciones.map(s=>({nombre:s.nombre, infoHIIT:s.infoHIIT||'', items:s.items}))};
+  })};
+  const nombre=buildRutinaNombre();
+  if(nombre==='Mi Plan de Entrenamiento - '){toast('Elegí un alumno (o escribí un apodo).','err');return;}
+
+  const payload={alumno_id:Number(alumnoId),nombre,plan:planOut};
+  let res = editId ? await sb.from('rutinas').update(payload).eq('id',editId).select().single()
+                   : await sb.from('rutinas').insert(payload).select().single();
+  if(res.error){toast('Error al guardar: '+res.error.message,'err');return;}
+  editId=res.data.id; toast('Rutina guardada ✓','ok'); loadSavedRutinas(alumnoId);
 }
 
 document.getElementById('newBtn').onclick=newRutina;
 function newRutina(){
-  editId=null; activeSec=null; combineTarget=null;
+  editId=null;activeSec=null;combineTarget=null;
   plan={dias:[blankDia()]};
-  document.getElementById('rutinaNombre').value='';
-  renderDias();
-  toast('Listo para una rutina nueva.','ok');
+  document.getElementById('apodo').value='';
+  renderDias();updateNamePreview();toast('Listo para una rutina nueva.','ok');
 }
-
-document.getElementById('previewBtn').onclick=()=>{
-  alert(JSON.stringify(plan,null,2));
-};
+document.getElementById('previewBtn').onclick=()=>alert(JSON.stringify(plan,null,2));
 
 /* ---------- helpers ---------- */
+function val(id){const el=document.getElementById(id);return el?el.value:'';}
 function escapeHtml(s){return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 function escapeAttr(s){return (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
 </script>
