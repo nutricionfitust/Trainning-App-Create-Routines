@@ -121,6 +121,8 @@
 <div class="topbar">
   <a class="brand" href="https://instagram.com/nutricionfitust" target="_blank" rel="noopener" style="text-decoration:none;color:inherit">Nutrición<span>Fit</span> · Armador de Rutinas</a>
   <div class="sp"></div>
+  <button class="btn ghost sm hidden" id="homeBtn">🏠 Inicio</button>
+  <button class="btn ghost sm hidden" id="carpetasBtn">Carpetas / Planes</button>
   <button class="btn ghost sm hidden" id="manageExBtn">Gestionar ejercicios</button>
   <span class="pill" id="userPill"></span>
   <button class="btn ghost sm hidden" id="logoutBtn">Salir</button>
@@ -267,6 +269,8 @@ async function startApp(email){
   document.getElementById('app').classList.remove('hidden');
   document.getElementById('logoutBtn').classList.remove('hidden');
   document.getElementById('manageExBtn').classList.remove('hidden');
+  document.getElementById('homeBtn').classList.remove('hidden');
+  document.getElementById('carpetasBtn').classList.remove('hidden');
   document.getElementById('userPill').textContent=email||'conectado';
   fillCarpetas();
   await loadEjercicios();
@@ -318,6 +322,99 @@ function renderCatalog(){
 
 /* ---------- gestión de ejercicios / videos de Drive (cambio 11) ---------- */
 document.getElementById('manageExBtn').onclick=()=>openExModal(null);
+
+/* ---------- botón Inicio: reinicia el armador ---------- */
+document.getElementById('homeBtn').onclick=()=>{
+  selAlumno=null; editId=null; CURRENT_ALUMNO_ID=null; RUTINAS_ALUMNO=[];
+  activeSec=null; combineTarget=null;
+  aInput().value=''; document.getElementById('rutinaPass').value=''; document.getElementById('apodo').value='';
+  document.getElementById('naNombre').value=''; document.getElementById('naCarpeta').value='';
+  document.getElementById('nuevoAlumnoBox').classList.add('hidden');
+  closeAlumnoList(); document.getElementById('rutinaPickerList').classList.add('hidden');
+  document.getElementById('search').value=''; document.getElementById('groupFilter').value='';
+  plan={dias:[blankDia()]};
+  document.getElementById('savedList').innerHTML='<p class="empty">Elegí un alumno para ver sus rutinas.</p>';
+  renderCatalog(); renderDias(); updateNamePreview(); updateRutinaPicker();
+  window.scrollTo({top:0,behavior:'smooth'});
+  toast('Armador reiniciado. A armar 💪','ok');
+};
+
+/* ---------- botón Carpetas / Planes: explorador ---------- */
+document.getElementById('carpetasBtn').onclick=openCarpetasModal;
+async function openCarpetasModal(){
+  const host=document.getElementById('modalHost');
+  host.innerHTML=`<div class="modal-bg"><div class="modal" style="width:min(640px,94vw)">
+    <h2 style="margin-top:0">Carpetas / Planes</h2>
+    <input class="field" id="cpSearch" placeholder="Buscar alumno o rutina en todas las carpetas…" autocomplete="off">
+    <div id="cpBody" style="margin-top:12px">Cargando…</div>
+    <div class="row" style="margin-top:14px"><span class="sp" style="flex:1"></span><button class="btn ghost" id="cpClose">Cerrar</button></div>
+  </div></div>`;
+  const close=()=>host.innerHTML='';
+  document.getElementById('cpClose').onclick=close;
+  host.querySelector('.modal-bg').onclick=e=>{if(e.target.classList.contains('modal-bg'))close();};
+
+  // traer TODAS las rutinas (con su alumno)
+  const {data,error}=await sb.from('rutinas').select('*').order('creado_en',{ascending:true});
+  const RUTS = error?[]:(data||[]);
+  // armar índice por carpeta
+  const alumnoById={}; ALUMNOS.forEach(a=>alumnoById[a.id]=a);
+  const porCarpeta={}; CARPETAS.forEach(c=>porCarpeta[c]={alumnos:new Set(),rutinas:0});
+  const sinCarpeta={alumnos:new Set(),rutinas:0};
+  // alumnos sin rutinas igual cuentan en su carpeta
+  ALUMNOS.forEach(a=>{ const c=a.carpeta&&porCarpeta[a.carpeta]?a.carpeta:null; (c?porCarpeta[c]:sinCarpeta).alumnos.add(a.id); });
+  RUTS.forEach(r=>{ const a=alumnoById[r.alumno_id]; const c=a&&a.carpeta&&porCarpeta[a.carpeta]?a.carpeta:null; (c?porCarpeta[c]:sinCarpeta).rutinas++; });
+
+  function rowAlumno(a){ return `<div class="combo-item" data-al="${a.id}">${escapeHtml(a.nombre)} · <span class="muted">${escapeHtml(a.carpeta||'sin carpeta')}</span></div>`; }
+  function rowRutina(r){ const a=alumnoById[r.alumno_id]; return `<div class="combo-item" data-rt="${r.id}" data-rtal="${r.alumno_id}">🔑 ${escapeHtml(r.nombre)} · <span class="muted">${escapeHtml(a?a.nombre:'?')} — ${escapeHtml(a&&a.carpeta||'sin carpeta')}</span></div>`; }
+
+  function render(){
+    const q=norm(document.getElementById('cpSearch').value);
+    const body=document.getElementById('cpBody');
+    if(q){
+      const alMatch=ALUMNOS.filter(a=>norm(a.nombre).includes(q));
+      const rtMatch=RUTS.filter(r=>norm(r.nombre).includes(q));
+      body.innerHTML=`<div class="combo-list" style="position:static;max-height:46vh">
+        ${alMatch.length?'<div class="cat-group-h">Alumnos</div>'+alMatch.map(rowAlumno).join(''):''}
+        ${rtMatch.length?'<div class="cat-group-h">Rutinas</div>'+rtMatch.map(rowRutina).join(''):''}
+        ${(!alMatch.length&&!rtMatch.length)?'<div class="combo-item">Sin resultados.</div>':''}
+      </div>`;
+    }else{
+      const list=CARPETAS.map(c=>{
+        const o=porCarpeta[c];
+        return `<div class="combo-item" data-carpeta="${escapeAttr(c)}"><b>${escapeHtml(c)}</b> · <span class="muted">${o.alumnos.size} alumno(s) · ${o.rutinas} rutina(s)</span></div>`;
+      }).join('');
+      const extra = sinCarpeta.alumnos.size?`<div class="combo-item" data-carpeta="__none__"><b>Sin carpeta</b> · <span class="muted">${sinCarpeta.alumnos.size} alumno(s) · ${sinCarpeta.rutinas} rutina(s)</span></div>`:'';
+      body.innerHTML=`<div class="combo-list" style="position:static;max-height:46vh">${list}${extra}</div>`;
+    }
+    wire(body);
+  }
+  function renderCarpeta(c){
+    const body=document.getElementById('cpBody');
+    const als=ALUMNOS.filter(a=>(c==='__none__')?(!a.carpeta||!porCarpeta[a.carpeta]):(a.carpeta===c));
+    let html=`<button class="btn ghost sm" data-back>← Volver</button><div class="cat-group-h" style="margin-top:8px">${escapeHtml(c==='__none__'?'Sin carpeta':c)}</div><div class="combo-list" style="position:static;max-height:42vh">`;
+    if(!als.length) html+='<div class="combo-item">Sin alumnos en esta carpeta.</div>';
+    als.forEach(a=>{
+      const rs=RUTS.filter(r=>r.alumno_id==a.id);
+      html+=rowAlumno(a);
+      rs.forEach((r,i)=>html+=`<div class="combo-item" data-rt="${r.id}" data-rtal="${a.id}" style="padding-left:24px">N°${i+1} · ${escapeHtml(r.nombre)} · <span class="muted mono" style="font-size:11px">🔑 ${escapeHtml(r.password||'—')}</span></div>`);
+    });
+    html+='</div>';
+    body.innerHTML=html;
+    body.querySelector('[data-back]').onclick=render;
+    wire(body);
+  }
+  function wire(scope){
+    scope.querySelectorAll('[data-carpeta]').forEach(el=>el.onclick=()=>renderCarpeta(el.dataset.carpeta));
+    scope.querySelectorAll('[data-al]').forEach(el=>el.onclick=async()=>{close();await chooseAlumno(ALUMNOS.find(x=>x.id==el.dataset.al));});
+    scope.querySelectorAll('[data-rt]').forEach(el=>el.onclick=async()=>{
+      close(); await chooseAlumno(ALUMNOS.find(x=>x.id==el.dataset.rtal));
+      const r=RUTS.find(x=>x.id==el.dataset.rt); if(r)loadRutinaForEdit(r);
+    });
+  }
+  document.getElementById('cpSearch').oninput=render;
+  render();
+}
+
 function openExModal(ex){
   const isEdit=!!ex;
   const groupsOpts=Object.keys(GRUPOS_LABEL).map(g=>`<option value="${g}" ${ex&&ex.grupo===g?'selected':''}>${GRUPOS_LABEL[g]}</option>`).join('');
