@@ -87,8 +87,10 @@
   #vidPopover .vp-close:hover{color:var(--danger)}
   #vidPopover .vp-direct{color:var(--muted);font-size:13px;text-decoration:none;padding:2px 4px;transition:color .15s ease}
   #vidPopover .vp-direct:hover{color:var(--blue-2)}
-  #vidPopover iframe{display:block;width:100%;height:236px;border:none}
-  #vidPopover video{display:block;width:100%;max-height:280px;background:#000;border-radius:0 0 14px 14px}
+  #vidPopover iframe{display:block;width:100%;height:236px;border:none;background:#000}
+  #vidPopover .vp-loading{position:absolute;bottom:50%;left:50%;transform:translate(-50%,50%);color:var(--muted);font-size:12px;pointer-events:none}
+  #vidPopover .vp-fallback{display:none;padding:16px;text-align:center;font-size:13px;color:var(--muted)}
+  #vidPopover .vp-fallback.show{display:block}
   @media(max-width:500px){#vidPopover{width:94vw} #vidPopover iframe{height:200px}}
 
   @keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -257,7 +259,14 @@
 <div id="toast"></div>
 <div id="vidPopover">
   <div class="vp-head"><span class="vp-title" id="vpTitle"></span><a class="vp-direct" id="vpDirect" href="#" target="_blank" rel="noopener" title="Abrir en Drive">↗</a><button class="vp-close" id="vpClose">✕</button></div>
-  <iframe id="vpFrame" allow="autoplay; encrypted-media; fullscreen" allowfullscreen referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-popups allow-presentation"></iframe>
+  <div style="position:relative">
+    <iframe id="vpFrame" allow="autoplay; encrypted-media; fullscreen" allowfullscreen style="display:none"></iframe>
+    <div class="vp-loading" id="vpLoading">Cargando video…</div>
+  </div>
+  <div class="vp-fallback" id="vpFallback">
+    No se pudo cargar.<br>
+    <button class="btn sm" id="vpPopupBtn" style="margin-top:8px">Abrir en ventana</button>
+  </div>
 </div>
 <div id="modalHost"></div>
 
@@ -377,27 +386,50 @@ function renderCatalog(){
 
 /* ---------- gestión de ejercicios / videos de Drive (cambio 11) ---------- */
 /* ---------- video popover ---------- */
-function driveEmbedUrl(url){
+function driveFileId(url){
   if(!url) return '';
   const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  if(!m) return url;
-  return 'https://drive.google.com/file/d/'+m[1]+'/preview';
+  return m ? m[1] : '';
+}
+function driveEmbedUrl(url){
+  const id=driveFileId(url);
+  return id ? 'https://drive.google.com/file/d/'+id+'/preview' : url;
 }
 function driveDirectUrl(url){
-  if(!url) return url;
-  const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  return m ? 'https://drive.google.com/file/d/'+m[1]+'/view' : url;
+  const id=driveFileId(url);
+  return id ? 'https://drive.google.com/file/d/'+id+'/view' : url;
 }
+let _vpTimer=null;
 function openVidPopover(btn, url, name){
   const pop=document.getElementById('vidPopover');
   const frame=document.getElementById('vpFrame');
   if(pop.classList.contains('open') && pop._currentUrl===url){ closeVidPopover(); return; }
   document.getElementById('vpTitle').textContent=name||'Video';
-  document.getElementById('vpDirect').href=driveDirectUrl(url);
-  frame.src='about:blank';
+  const directUrl=driveDirectUrl(url);
+  document.getElementById('vpDirect').href=directUrl;
+  document.getElementById('vpLoading').style.display='block';
+  document.getElementById('vpFallback').classList.remove('show');
+  frame.style.display='none'; frame.src='about:blank';
   pop._currentUrl=url;
-  // set iframe src after positioning
-  setTimeout(()=>{ frame.src=driveEmbedUrl(url); },50);
+  pop._directUrl=directUrl;
+
+  // go straight to iframe embed
+  frame.style.display='block';
+  setTimeout(()=>{ frame.src=driveEmbedUrl(url); },30);
+  frame.onload=()=>{
+    document.getElementById('vpLoading').style.display='none';
+    clearTimeout(_vpTimer);
+  };
+
+  clearTimeout(_vpTimer);
+  _vpTimer=setTimeout(()=>{
+    document.getElementById('vpFallback').classList.add('show');
+    document.getElementById('vpLoading').style.display='none';
+  },5000);
+
+  document.getElementById('vpPopupBtn').onclick=()=>{
+    window.open(directUrl,'nfu_video','width=640,height=480,menubar=no,toolbar=no,location=no,status=no');
+  };
   // position near the button but keep in viewport
   const rect=btn.getBoundingClientRect();
   const pw=Math.min(420, window.innerWidth*0.92);
@@ -420,8 +452,14 @@ function closeVidPopover(){
   const pop=document.getElementById('vidPopover');
   pop.classList.remove('open');
   pop._currentUrl=null;
-  // clear iframe after transition to stop video
-  setTimeout(()=>{ if(!pop.classList.contains('open')) document.getElementById('vpFrame').src=''; },300);
+  clearTimeout(_vpTimer);
+  setTimeout(()=>{
+    if(!pop.classList.contains('open')){
+      document.getElementById('vpFrame').src='';
+      document.getElementById('vpFrame').style.display='none';
+      document.getElementById('vpFallback').classList.remove('show');
+    }
+  },300);
 }
 document.getElementById('vpClose').onclick=closeVidPopover;
 document.addEventListener('click',(e)=>{
