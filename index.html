@@ -34,16 +34,18 @@
   .card h2 small{font-weight:500;color:var(--muted)}
 
   label{display:block;font-size:12px;color:var(--muted);margin:10px 0 5px}
-  .field{width:100%;background:var(--surface-2);border:1px solid var(--line);color:var(--txt);padding:10px 11px;border-radius:10px;font-size:14px}
-  .field:focus{outline:none;border-color:var(--blue)}
+  .field{width:100%;background:var(--surface-2);border:1px solid var(--line);color:var(--txt);padding:10px 11px;border-radius:10px;font-size:14px;transition:border-color .2s ease, box-shadow .2s ease}
+  .field:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 2px rgba(0,114,251,.15)}
   textarea.field{resize:vertical;min-height:60px}
-  .btn{background:var(--blue);color:#fff;border:none;padding:10px 15px;border-radius:10px;font-weight:700;font-size:14px}
+  .btn{background:var(--blue);color:#fff;border:none;padding:10px 15px;border-radius:10px;font-weight:700;font-size:14px;transition:filter .15s ease, transform .1s ease}
   .btn:hover{filter:brightness(1.08)}
-  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--txt);font-weight:600}
+  .btn:active{transform:scale(.97)}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--txt);font-weight:600;transition:border-color .2s ease, color .2s ease, transform .1s ease}
   .btn.ghost:hover{border-color:var(--blue-2)}
+  .btn.ghost:active{transform:scale(.97)}
   .btn.sm{padding:6px 10px;font-size:12px;border-radius:8px}
   .btn.danger{background:transparent;border:1px solid var(--line);color:var(--danger)}
-  .btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+  .btn.active{background:var(--blue);color:#fff;border-color:var(--blue);transition:all .2s ease}
   .row{display:flex;gap:8px;align-items:center}
   .muted{color:var(--muted)}
   .hint{font-size:12px;color:var(--muted)}
@@ -61,23 +63,26 @@
   .num-pill{display:inline-block;font-size:11px;font-weight:700;color:#fff;background:var(--blue);border-radius:6px;padding:2px 7px;margin-right:6px}
   .cat-group{margin-bottom:6px}
   .cat-group-h{position:sticky;top:0;background:var(--surface);font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--blue-3);padding:6px 2px}
-  .ex{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:9px;border:1px solid transparent}
+  .ex{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:9px;border:1px solid transparent;cursor:pointer;transition:background .15s ease, border-color .15s ease, transform .1s ease}
   .ex:hover{background:var(--surface-2);border-color:var(--line)}
+  .ex:active{transform:scale(.99)}
   .ex .nm{flex:1;font-size:13px}
   .ex .vid{font-size:10px}
   .ex .vid.no{color:var(--danger)} .ex .vid.yes{color:var(--ok)}
   .ex .edit{background:transparent;border:none;color:var(--muted);font-size:13px}
   .ex .edit:hover{color:var(--blue-2)}
-  .add{background:var(--blue);color:#fff;border:none;width:26px;height:26px;border-radius:8px;font-size:16px;line-height:1;flex:none}
+  .add{background:var(--blue);color:#fff;border:none;width:26px;height:26px;border-radius:8px;font-size:16px;line-height:1;flex:none;transition:transform .1s ease}
+  .add:active{transform:scale(.85)}
 
-  .dia{border:1px solid var(--line);border-radius:12px;margin-bottom:14px;overflow:hidden}
+  @keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .dia{border:1px solid var(--line);border-radius:12px;margin-bottom:14px;overflow:hidden;animation:slideIn .25s ease-out}
   .dia-h{display:flex;gap:8px;align-items:center;padding:10px 12px;background:var(--surface-2)}
   .dia-prefix{font-weight:700;color:var(--blue-3);white-space:nowrap}
   .dia-h .field{flex:1;font-weight:700}
   .sec{padding:10px 12px;border-top:1px solid var(--line);transition:all .2s ease;border-radius:0}
   .sec-h{display:flex;gap:8px;align-items:center;margin-bottom:8px}
   .sec-h .field{flex:1}
-  .item{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:8px}
+  .item{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:8px;animation:slideIn .2s ease-out}
   .item.superset{border-left:3px solid var(--blue)}
   .item-tag{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--blue-3);margin-bottom:6px;display:flex;gap:8px;align-items:center}
   .exrow{display:grid;grid-template-columns:1fr 64px 1fr 24px 24px;gap:7px;align-items:center;margin-bottom:2px}
@@ -259,6 +264,10 @@ const store = {
   set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
 };
 let sb=null, EJERCICIOS=[], ALUMNOS=[], activeSec=null, combineTarget=null, editId=null, RUTINAS_ALUMNO=[];
+let lastSavedSnapshot='';
+function currentSnapshot(){ return JSON.stringify({plan,apodo:val('apodo'),pass:val('rutinaPass')}); }
+function markSaved(){ lastSavedSnapshot=currentSnapshot(); }
+function hasUnsavedChanges(){ return lastSavedSnapshot!==currentSnapshot(); }
 
 /* plan: { dias: [ { musculo, secciones: [ { nombre, infoHIIT, items:[ {tipo,ejercicios:[{nombre,series,reps}],descanso} ] } ] } ] } */
 let plan = { dias: [] };
@@ -298,7 +307,7 @@ async function startApp(email){
   await loadEjercicios();
   await loadAlumnos();
   if(plan.dias.length===0) addDia();
-  updateNamePreview();
+  updateNamePreview(); markSaved();
 }
 
 function fillCarpetas(){
@@ -328,7 +337,7 @@ function renderCatalog(){
   for(const g of Object.keys(byGroup)){
     html+=`<div class="cat-group"><div class="cat-group-h">${GRUPOS_LABEL[g]||g}</div>`;
     for(const e of byGroup[g]){
-      html+=`<div class="ex">
+      html+=`<div class="ex" data-addnombre="${escapeAttr(e.nombre)}">
         <span class="vid ${e.video_url?'yes':'no'}" title="${e.video_url?'Con video':'Sin video'}">●</span>
         <span class="nm">${escapeHtml(e.nombre)}</span>
         <button class="edit" data-edit="${escapeAttr(e.nombre)}" title="Editar / video">✎</button>
@@ -338,15 +347,16 @@ function renderCatalog(){
     html+='</div>';
   }
   list.innerHTML=html||'<p class="empty">Sin resultados.</p>';
-  list.querySelectorAll('.add').forEach(b=>b.onclick=()=>addExerciseToActive(b.dataset.nombre));
-  list.querySelectorAll('.edit').forEach(b=>b.onclick=()=>openExModal(EJERCICIOS.find(x=>x.nombre===b.dataset.edit)));
+  list.querySelectorAll('.add').forEach(b=>b.onclick=e=>{e.stopPropagation();addExerciseToActive(b.dataset.nombre);});
+  list.querySelectorAll('.edit').forEach(b=>b.onclick=e=>{e.stopPropagation();openExModal(EJERCICIOS.find(x=>x.nombre===b.dataset.edit));});
+  list.querySelectorAll('.ex[data-addnombre]').forEach(el=>el.onclick=()=>addExerciseToActive(el.dataset.addnombre));
 }
 
 /* ---------- gestión de ejercicios / videos de Drive (cambio 11) ---------- */
 document.getElementById('manageExBtn').onclick=()=>openExModal(null);
 
 /* ---------- botón Inicio: reinicia el armador ---------- */
-document.getElementById('homeBtn').onclick=()=>{
+function doFullReset(){
   selAlumno=null; editId=null; CURRENT_ALUMNO_ID=null; RUTINAS_ALUMNO=[];
   activeSec=null; combineTarget=null;
   aInput().value=''; document.getElementById('rutinaPass').value=''; document.getElementById('apodo').value='';
@@ -356,9 +366,22 @@ document.getElementById('homeBtn').onclick=()=>{
   document.getElementById('search').value=''; document.getElementById('groupFilter').value='';
   plan={dias:[blankDia()]};
   document.getElementById('savedList').innerHTML='<p class="empty">Elegí un alumno para ver sus rutinas.</p>';
-  renderCatalog(); renderDias(); updateNamePreview(); updateRutinaPicker();
+  renderCatalog(); renderDias(); updateNamePreview(); updateRutinaPicker(); markSaved();
   window.scrollTo({top:0,behavior:'smooth'});
   toast('Armador reiniciado. A armar 💪','ok');
+}
+document.getElementById('homeBtn').onclick=()=>{
+  if(!hasUnsavedChanges()){ doFullReset(); return; }
+  openModal(`
+    <h2 style="margin-top:0">Tenés cambios sin guardar</h2>
+    <p style="color:var(--muted);margin:0">¿Querés guardar la rutina actual antes de reiniciar?</p>
+    <div class="row" style="margin-top:16px">
+      <button class="btn ghost" id="discardBtn">No</button>
+      <span class="sp" style="flex:1"></span>
+      <button class="btn" id="saveFirstBtn">Sí</button>
+    </div>`);
+  document.getElementById('discardBtn').onclick=()=>{ closeModal(); doFullReset(); };
+  document.getElementById('saveFirstBtn').onclick=async()=>{ closeModal(); await saveRutina(); doFullReset(); };
 };
 
 /* ---------- botón Carpetas / Planes: explorador ---------- */
@@ -602,7 +625,7 @@ function loadRutinaForEdit(r){
   document.getElementById('apodo').value=(base===currentAlumnoNombre())?'':base;
   plan=(r.plan&&r.plan.dias)?normalizePlan(JSON.parse(JSON.stringify(r.plan))):{dias:[]};
   if(plan.dias.length===0) plan.dias.push(blankDia());
-  renderDias(); updateNamePreview(); renderSavedList();
+  renderDias(); updateNamePreview(); renderSavedList(); markSaved();
   toast('Rutina cargada para editar.','ok'); window.scrollTo({top:0,behavior:'smooth'});
 }
 function duplicarRutina(r){
@@ -856,21 +879,33 @@ async function saveRutina(){
     toast(dup?'Esa contraseña ya está usada en otra rutina. Poné una distinta.':'Error al guardar: '+res.error.message,'err');
     return;
   }
-  editId=res.data.id; toast('Rutina guardada ✓','ok'); loadSavedRutinas(alumnoId);
+  editId=res.data.id; markSaved(); toast('Rutina guardada ✓','ok'); loadSavedRutinas(alumnoId);
 }
 
 document.getElementById('newBtn').onclick=newRutina;
-function newRutina(){
+function doNewRutina(){
   editId=null;activeSec=null;combineTarget=null;
   plan={dias:[blankDia()]};
   document.getElementById('apodo').value='';
   document.getElementById('rutinaPass').value='';
-  renderDias();updateNamePreview();
+  renderDias();updateNamePreview();markSaved();
   if(CURRENT_ALUMNO_ID) renderSavedList(); else updateRutinaNum();
   toast('Listo para una rutina nueva.','ok');
   window.scrollTo({top:0,behavior:'smooth'});
 }
-document.getElementById('previewBtn')&&(document.getElementById('previewBtn').onclick=()=>{});
+function newRutina(){
+  if(!hasUnsavedChanges()){ doNewRutina(); return; }
+  openModal(`
+    <h2 style="margin-top:0">Tenés cambios sin guardar</h2>
+    <p style="color:var(--muted);margin:0">¿Querés guardar la rutina actual antes de empezar una nueva?</p>
+    <div class="row" style="margin-top:16px">
+      <button class="btn ghost" id="discardBtn">No</button>
+      <span class="sp" style="flex:1"></span>
+      <button class="btn" id="saveFirstBtn">Sí</button>
+    </div>`);
+  document.getElementById('discardBtn').onclick=()=>{ closeModal(); doNewRutina(); };
+  document.getElementById('saveFirstBtn').onclick=async()=>{ closeModal(); await saveRutina(); doNewRutina(); };
+}
 
 /* ---------- helpers ---------- */
 function val(id){const el=document.getElementById(id);return el?el.value:'';}
