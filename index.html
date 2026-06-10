@@ -86,10 +86,14 @@
   .note-toggle{background:transparent;border:1px solid var(--line);color:var(--muted);width:24px;height:24px;border-radius:6px;font-size:13px;padding:0;display:flex;align-items:center;justify-content:center}
   .note-toggle:hover{color:var(--blue-2);border-color:var(--blue-2)}
   .note-toggle.has{color:var(--ok);border-color:var(--ok)}
-  @keyframes notePulse{0%{box-shadow:0 0 0 0 rgba(57,192,122,.5)}50%{box-shadow:0 0 0 6px rgba(57,192,122,0)}100%{box-shadow:none}}
-  .note-toggle.pulse{animation:notePulse .5s ease-out}
   .ex-note{margin-bottom:6px;margin-left:4px;max-height:0;overflow:hidden;opacity:0;transition:max-height .25s ease, opacity .2s ease}
   .ex-note.show{max-height:60px;opacity:1;overflow:visible;margin-bottom:6px}
+  @keyframes notePulse{
+    0%  {border-color:var(--blue);box-shadow:0 0 0 2px rgba(0,114,251,.35)}
+    50% {border-color:var(--ok); box-shadow:0 0 0 3px rgba(57,192,122,.3)}
+    100%{border-color:var(--line);box-shadow:none}
+  }
+  .ex-note.pulse input{animation:notePulse .6s ease-out forwards}
   .x{background:transparent;border:none;color:var(--muted);font-size:16px}
   .x:hover{color:var(--danger)}
   .item-foot{display:flex;gap:8px;align-items:center;margin-top:4px}
@@ -139,7 +143,7 @@
   <div class="sp"></div>
   <button class="btn ghost sm hidden" id="homeBtn">🏠 Inicio</button>
   <button class="btn ghost sm hidden" id="carpetasBtn">Carpetas / Planes</button>
-  <a class="btn ghost sm hidden" id="viewAppBtn" href="https://trainning-app-view-routines.vercel.app" target="_blank" rel="noopener" style="text-decoration:none;text-align:center">App de Entrenamientos</a>
+  <a class="btn ghost sm hidden" id="viewAppBtn" href="https://trainning-app-view-routines.vercel.app" target="_blank" rel="noopener" style="text-decoration:none;text-align:center">App de Entrenamiento</a>
   <button class="btn ghost sm hidden" id="manageExBtn">Gestionar ejercicios</button>
   <span class="pill" id="userPill"></span>
   <button class="btn ghost sm hidden" id="logoutBtn">Salir</button>
@@ -735,8 +739,12 @@ function renderDias(){
         it.querySelectorAll('[data-notetoggle]').forEach(b=>{
           b.onclick=()=>{
             const xi=+b.dataset.notetoggle, box=it.querySelector(`[data-notebox="${xi}"]`);
-            if(!box.classList.contains('show')){box.classList.add('show');box.querySelector('input').focus();}
-            else{box.classList.remove('show');item.ejercicios[xi].nota='';b.classList.remove('has');b.classList.remove('pulse');}
+            if(!box.classList.contains('show')){
+              box.classList.add('show'); box.querySelector('input').focus();
+            } else {
+              // cerrar igual que blur vacío
+              box.querySelector('input').blur();
+            }
           };
         });
         it.querySelectorAll('.ex-note input').forEach(inp=>{
@@ -745,11 +753,19 @@ function renderDias(){
             const v=inp.value.trim();
             const btn=it.querySelector(`[data-notetoggle="${xi}"]`);
             const box=it.querySelector(`[data-notebox="${xi}"]`);
-            if(!v){box.classList.remove('show');item.ejercicios[xi].nota='';btn.classList.remove('has');btn.classList.remove('pulse');}
-            else{btn.classList.add('has');btn.classList.remove('pulse');void btn.offsetWidth;btn.classList.add('pulse');}
+            if(!v){
+              box.classList.remove('show','pulse');
+              item.ejercicios[xi].nota='';
+              btn.classList.remove('has');
+            } else {
+              btn.classList.add('has');
+              box.classList.remove('pulse');
+              void box.offsetWidth; // reset animation
+              box.classList.add('pulse');
+            }
           }
-          inp.addEventListener('blur',confirmNote);
-          inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();inp.blur();}});
+          inp.addEventListener('blur', confirmNote);
+          inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); inp.blur(); } });
         });
         it.querySelectorAll('[data-rmex]').forEach(b=>b.onclick=()=>{
           item.ejercicios.splice(+b.dataset.rmex,1);
