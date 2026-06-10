@@ -736,20 +736,27 @@ function renderDias(){
             <span class="sp" style="flex:1"></span>
             <button class="x" data-rmitem title="Quitar bloque">🗑</button></div>`;
         it.querySelectorAll('[data-f]').forEach(inp=>inp.oninput=e=>{item.ejercicios[+inp.dataset.xi][inp.dataset.f]=e.target.value;});
+        let _noteClosing=false;
         it.querySelectorAll('[data-notetoggle]').forEach(b=>{
+          b.addEventListener('mousedown', e=>{ e.preventDefault(); _noteClosing=true; }); // prevent blur race
           b.onclick=()=>{
+            _noteClosing=false;
             const xi=+b.dataset.notetoggle, box=it.querySelector(`[data-notebox="${xi}"]`);
-            if(!box.classList.contains('show')){
-              box.classList.add('show'); box.querySelector('input').focus();
+            if(box.classList.contains('show')){
+              // close it
+              const v=box.querySelector('input').value.trim();
+              box.classList.remove('show','pulse');
+              if(!v){ item.ejercicios[xi].nota=''; b.classList.remove('has'); }
+              else { b.classList.add('has'); box.classList.add('pulse'); }
             } else {
-              // cerrar igual que blur vacío
-              box.querySelector('input').blur();
+              box.classList.add('show'); box.querySelector('input').focus();
             }
           };
         });
         it.querySelectorAll('.ex-note input').forEach(inp=>{
           const xi=+inp.dataset.xi;
           function confirmNote(){
+            if(_noteClosing){ _noteClosing=false; return; } // skip, the click handler will handle it
             const v=inp.value.trim();
             const btn=it.querySelector(`[data-notetoggle="${xi}"]`);
             const box=it.querySelector(`[data-notebox="${xi}"]`);
@@ -760,7 +767,7 @@ function renderDias(){
             } else {
               btn.classList.add('has');
               box.classList.remove('pulse');
-              void box.offsetWidth; // reset animation
+              void box.offsetWidth;
               box.classList.add('pulse');
             }
           }
